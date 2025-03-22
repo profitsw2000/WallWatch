@@ -1,5 +1,6 @@
 package ru.profitsw2000.wallwatch.presentation
 
+import android.app.Activity
 import android.os.Bundle
 import com.google.android.material.snackbar.Snackbar
 import androidx.appcompat.app.AppCompatActivity
@@ -12,7 +13,6 @@ import ru.profitsw2000.wallwatch.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityMainBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {

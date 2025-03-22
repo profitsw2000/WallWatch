@@ -22,3 +22,5 @@ dependencyResolutionManagement {
 
 rootProject.name = "WallWatch"
 include(":app")
+include(":core")
+include(":data")
