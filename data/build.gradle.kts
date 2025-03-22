@@ -1,5 +1,5 @@
 plugins {
-    alias(libs.plugins.ww.main.app.gradle.plugin)
+    alias(libs.plugins.ww.main.lib.gradle.plugin)
 }
 
 android {
