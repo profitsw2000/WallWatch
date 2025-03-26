@@ -9,6 +9,7 @@ android {
 dependencies {
     implementation(project(":core"))
     implementation(project(":data"))
+    implementation(project(":updateScreen"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
