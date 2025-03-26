@@ -1,4 +1,7 @@
 <resources>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="default_wall_watch_time_text">22 : 34 : 56</string>
+    <string name="default_wall_watch_date_text">25.03 Вт</string>
+    <string name="update_button_text">ОБНОВИТЬ</string>
 </resources>
