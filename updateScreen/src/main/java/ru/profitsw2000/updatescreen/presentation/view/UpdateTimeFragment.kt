@@ -79,7 +79,6 @@ class UpdateTimeFragment : Fragment(), OnBluetoothStateListener {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        //requireActivity().invalidateOptionsMenu()
         return when (item.itemId) {
             R.id.connect -> {
                 true
@@ -112,9 +111,9 @@ class UpdateTimeFragment : Fragment(), OnBluetoothStateListener {
     private fun bluetoothOperation() {
         if (bluetoothAdapter == null) {
             MaterialAlertDialogBuilder(requireActivity())
-                .setTitle("Ошибка включения Bluetooth")
-                .setMessage("Bluetooth на данном устройстве отсутствует")
-                .setPositiveButton("OK") { dialog, _ -> dialog.dismiss()}
+                .setTitle(getString(R.string.bluetooth_on_error_info_dialog_title))
+                .setMessage(getString(R.string.bluetooth_on_error_info_dialog_message))
+                .setPositiveButton(getString(R.string.ok_dialog_button_text)) { dialog, _ -> dialog.dismiss()}
                 .create()
                 .show()
         } else {
@@ -147,19 +146,18 @@ class UpdateTimeFragment : Fragment(), OnBluetoothStateListener {
 
     private fun showRationaleDialog() {
         MaterialAlertDialogBuilder(requireActivity())
-            .setTitle("Разрешение Bluetooth")
-            .setMessage("При подключении к настенным часам используется Bluetooth. Для синхронизации отображаемого на настенных часах времени " +
-                    "необходимо предоставить приложению разрешение на использование Bluetooth.")
-            .setNegativeButton("OK") { dialog, _ -> dialog.dismiss() }
+            .setTitle(getString(R.string.bluetooth_permission_rationale_dialog_title))
+            .setMessage(getString(R.string.bluetooth_permission_rationale_dialog_text))
+            .setNegativeButton(getString(R.string.ok_dialog_button_text)) { dialog, _ -> dialog.dismiss() }
             .create()
             .show()
     }
 
     private fun showBluetoothEnablingDialog() {
         MaterialAlertDialogBuilder(requireActivity())
-            .setTitle("Включение Bluetooth")
-            .setMessage("Для синхронизации отображаемого на настенных часах времени необходимо включить Bluetooth.")
-            .setNegativeButton("OK") { dialog, _ -> dialog.dismiss() }
+            .setTitle(getString(R.string.bluetooth_on_warning_dialog_title))
+            .setMessage(getString(R.string.bluetooth_on_warning_dialog_text))
+            .setNegativeButton(getString(R.string.ok_dialog_button_text)) { dialog, _ -> dialog.dismiss() }
             .create()
             .show()
     }
