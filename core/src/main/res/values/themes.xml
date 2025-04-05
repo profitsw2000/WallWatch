@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="Theme.WallWatch" parent="Base.Theme.WallWatch"/>
+
+    <!-- Base application theme. -->
+    <style name="Base.Theme.WallWatch" parent="Theme.Material3.DayNight">
+<!--
+        &lt;!&ndash; Primary brand color. &ndash;&gt;
+        <item name="colorPrimary">@color/purple_200</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <item name="colorPrimaryContainer">@color/purple_200</item>
+        <item name="colorOnPrimaryContainer">@color/white</item>
+        <item name="colorPrimaryInverse">@color/purple_200</item>-->
+<!--
+        <item name="android:windowBackground">@drawable/flowers</item>
+-->
+        <item name="actionBarStyle">@style/WWAppActionBar</item>
+    </style>
+</resources>
