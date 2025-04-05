@@ -23,16 +23,20 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import org.koin.androidx.viewmodel.ext.android.viewModel
 import ru.profitsw2000.core.utils.bluetoothbroadcastreceiver.BluetoothStateBroadcastReceiver
 import ru.profitsw2000.core.utils.bluetoothbroadcastreceiver.OnBluetoothStateListener
 import ru.profitsw2000.updatescreen.R
 import ru.profitsw2000.updatescreen.databinding.FragmentUpdateTimeBinding
+import ru.profitsw2000.updatescreen.presentation.viewmodel.UpdateTimeViewModel
 
 class UpdateTimeFragment : Fragment(), OnBluetoothStateListener {
 
     private var _binding: FragmentUpdateTimeBinding? = null
     private val binding get() = _binding!!
+    private val updateTimeViewModel: UpdateTimeViewModel by viewModel()
     private val bluetoothStateBroadcastReceiver = BluetoothStateBroadcastReceiver(this)
     private var isConnected = false
     private val bluetoothManager: BluetoothManager by lazy {
@@ -72,6 +76,11 @@ class UpdateTimeFragment : Fragment(), OnBluetoothStateListener {
         return binding.root
     }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        observeData()
+    }
+
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         super.onCreateOptionsMenu(menu, inflater)
         inflater.inflate(R.menu.menu_update_time, menu)
@@ -106,6 +115,29 @@ class UpdateTimeFragment : Fragment(), OnBluetoothStateListener {
             menu.findItem(R.id.connect).setIcon(ru.profitsw2000.core.R.drawable.connected)
         else
             menu.findItem(R.id.connect).setIcon(ru.profitsw2000.core.R.drawable.unconnected)
+    }
+
+    private fun observeData() {
+        observeDateData()
+        observeTimeData()
+    }
+
+    private fun observeDateData() {
+        val observer = Observer<String> { renderDateData(it) }
+        updateTimeViewModel.dateLiveData.observe(viewLifecycleOwner, observer)
+    }
+
+    private fun renderDateData(dateString: String) = with(binding) {
+        dateTextView.text = dateString
+    }
+
+    private fun observeTimeData() {
+        val observer = Observer<String> { renderTimeData(it) }
+        updateTimeViewModel.timeLiveData.observe(viewLifecycleOwner, observer)
+    }
+
+    private fun renderTimeData(timeString: String) = with(binding) {
+        timeTextView.text = timeString
     }
 
     private fun bluetoothOperation() {

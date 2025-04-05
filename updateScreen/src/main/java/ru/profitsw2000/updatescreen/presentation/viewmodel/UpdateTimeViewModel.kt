@@ -12,4 +12,5 @@ class UpdateTimeViewModel(
     val dateLiveData: LiveData<String> = dateTimeRepository.dateDataString.asLiveData()
     val timeLiveData: LiveData<String> = dateTimeRepository.timeDataString.asLiveData()
 
+
 }
