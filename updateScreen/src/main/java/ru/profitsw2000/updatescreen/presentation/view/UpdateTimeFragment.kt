@@ -25,9 +25,11 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import ru.profitsw2000.core.utils.bluetoothbroadcastreceiver.BluetoothStateBroadcastReceiver
 import ru.profitsw2000.core.utils.bluetoothbroadcastreceiver.OnBluetoothStateListener
+import ru.profitsw2000.data.model.BluetoothState
 import ru.profitsw2000.updatescreen.R
 import ru.profitsw2000.updatescreen.databinding.FragmentUpdateTimeBinding
 import ru.profitsw2000.updatescreen.presentation.viewmodel.UpdateTimeViewModel
@@ -37,16 +39,18 @@ class UpdateTimeFragment : Fragment(), OnBluetoothStateListener {
     private var _binding: FragmentUpdateTimeBinding? = null
     private val binding get() = _binding!!
     private val updateTimeViewModel: UpdateTimeViewModel by viewModel()
-    private val bluetoothStateBroadcastReceiver = BluetoothStateBroadcastReceiver(this)
+    private val bluetoothAdapter: BluetoothAdapter by inject()
+    //private val bluetoothStateBroadcastReceiver = BluetoothStateBroadcastReceiver(this)
     private var isConnected = false
-    private val bluetoothManager: BluetoothManager by lazy {
+    private var bluetoothIsEnabled = false
+/*    private val bluetoothManager: BluetoothManager by lazy {
         requireActivity().getSystemService(BluetoothManager::class.java)
     }
     private val bluetoothAdapter: BluetoothAdapter by lazy {
         bluetoothManager.adapter
-    }
+    }*/
     private val requestCodeForEnable = 1
-    val requestPermissionLauncher = registerForActivityResult(
+    private val requestPermissionLauncher = registerForActivityResult(
             ActivityResultContracts.RequestPermission()
         ) { isGranted: Boolean ->
             if (isGranted) {
@@ -61,10 +65,10 @@ class UpdateTimeFragment : Fragment(), OnBluetoothStateListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
-        requireActivity().registerReceiver(
+/*        requireActivity().registerReceiver(
             bluetoothStateBroadcastReceiver,
             IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED)
-        )
+        )*/
     }
 
     override fun onCreateView(
@@ -84,7 +88,6 @@ class UpdateTimeFragment : Fragment(), OnBluetoothStateListener {
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         super.onCreateOptionsMenu(menu, inflater)
         inflater.inflate(R.menu.menu_update_time, menu)
-        menu.findItem(R.id.bluetooth).setIcon(ru.profitsw2000.core.R.drawable.bt_on)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -93,7 +96,7 @@ class UpdateTimeFragment : Fragment(), OnBluetoothStateListener {
                 true
             }
             R.id.bluetooth -> {
-                bluetoothOperation()
+                //bluetoothOperation()
                 true
             }
             else -> true
@@ -104,7 +107,7 @@ class UpdateTimeFragment : Fragment(), OnBluetoothStateListener {
         super.onPrepareOptionsMenu(menu)
 
         if (bluetoothPermissionIsGranted())
-            if (bluetoothAdapter.isEnabled)
+            if (bluetoothIsEnabled)
                 menu.findItem(R.id.bluetooth).setIcon(ru.profitsw2000.core.R.drawable.bt_on)
             else
                 menu.findItem(R.id.bluetooth).setIcon(ru.profitsw2000.core.R.drawable.bt_off)
@@ -120,6 +123,7 @@ class UpdateTimeFragment : Fragment(), OnBluetoothStateListener {
     private fun observeData() {
         observeDateData()
         observeTimeData()
+        observeBluetoothStateData()
     }
 
     private fun observeDateData() {
@@ -140,12 +144,38 @@ class UpdateTimeFragment : Fragment(), OnBluetoothStateListener {
         timeTextView.text = timeString
     }
 
+    private fun observeBluetoothStateData() {
+        val observer = Observer<BluetoothState> { renderBluetoothStateData(it) }
+        updateTimeViewModel.bluetoothIsEnabledData.observe(viewLifecycleOwner, observer)
+    }
+
+    private fun renderBluetoothStateData(bluetoothState: BluetoothState) {
+        when(bluetoothState) {
+            BluetoothState.BluetoothIsEnabled -> bluetoothIsEnabled = true
+            BluetoothState.BluetoothError -> showSimpleDialog(getString(R.string.bluetooth_on_error_info_dialog_title),
+                getString(R.string.bluetooth_on_error_info_dialog_message),
+                getString(R.string.ok_dialog_button_text))
+            BluetoothState.BluetoothIsDisabled -> bluetoothIsEnabled = false
+        }
+    }
+
+    private fun showSimpleDialog(messageTitle: String,
+                                 messageText: String,
+                                 buttonText: String) {
+        MaterialAlertDialogBuilder(requireActivity())
+            .setTitle(messageTitle)
+            .setMessage(messageText)
+            .setNeutralButton(buttonText) { dialog, _ -> dialog.dismiss()}
+            .create()
+            .show()
+    }
+
     private fun bluetoothOperation() {
         if (bluetoothAdapter == null) {
             MaterialAlertDialogBuilder(requireActivity())
                 .setTitle(getString(R.string.bluetooth_on_error_info_dialog_title))
                 .setMessage(getString(R.string.bluetooth_on_error_info_dialog_message))
-                .setPositiveButton(getString(R.string.ok_dialog_button_text)) { dialog, _ -> dialog.dismiss()}
+                .setNeutralButton(getString(R.string.ok_dialog_button_text)) { dialog, _ -> dialog.dismiss()}
                 .create()
                 .show()
         } else {
@@ -180,7 +210,7 @@ class UpdateTimeFragment : Fragment(), OnBluetoothStateListener {
         MaterialAlertDialogBuilder(requireActivity())
             .setTitle(getString(R.string.bluetooth_permission_rationale_dialog_title))
             .setMessage(getString(R.string.bluetooth_permission_rationale_dialog_text))
-            .setNegativeButton(getString(R.string.ok_dialog_button_text)) { dialog, _ -> dialog.dismiss() }
+            .setNeutralButton(getString(R.string.ok_dialog_button_text)) { dialog, _ -> dialog.dismiss() }
             .create()
             .show()
     }
@@ -189,7 +219,7 @@ class UpdateTimeFragment : Fragment(), OnBluetoothStateListener {
         MaterialAlertDialogBuilder(requireActivity())
             .setTitle(getString(R.string.bluetooth_on_warning_dialog_title))
             .setMessage(getString(R.string.bluetooth_on_warning_dialog_text))
-            .setNegativeButton(getString(R.string.ok_dialog_button_text)) { dialog, _ -> dialog.dismiss() }
+            .setNeutralButton(getString(R.string.ok_dialog_button_text)) { dialog, _ -> dialog.dismiss() }
             .create()
             .show()
     }
@@ -236,7 +266,8 @@ class UpdateTimeFragment : Fragment(), OnBluetoothStateListener {
 
     override fun onDestroy() {
         super.onDestroy()
-        requireActivity().unregisterReceiver(bluetoothStateBroadcastReceiver)
+        //requireActivity().unregisterReceiver(bluetoothStateBroadcastReceiver)
+        _binding = null
     }
 
     companion object {
@@ -244,7 +275,7 @@ class UpdateTimeFragment : Fragment(), OnBluetoothStateListener {
         fun newInstance() = UpdateTimeFragment()
     }
 
-    override fun onBluetoothStateChanged() {
+    override fun onBluetoothStateChanged(bluetoothIsEnabled: Boolean) {
         requireActivity().invalidateOptionsMenu()
     }
 }

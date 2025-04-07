@@ -10,7 +10,7 @@
 
     <item
         android:id="@+id/bluetooth"
-        android:icon="@drawable/bt_on"
+        android:icon="@drawable/bt_off"
         android:title="Switch bluetooth"
         app:showAsAction="always"/>
 </menu>
