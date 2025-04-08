@@ -1,9 +1,12 @@
 package ru.profitsw2000.data.data
 
+import android.annotation.SuppressLint
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothManager
 import android.content.Context
 import android.content.IntentFilter
+import android.os.Build
+import android.os.Build.VERSION
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import ru.profitsw2000.core.utils.bluetoothbroadcastreceiver.BluetoothStateBroadcastReceiver
@@ -21,27 +24,32 @@ class BluetoothRepositoryImpl(
     private val bluetoothAdapter: BluetoothAdapter by lazy {
         bluetoothManager.adapter
     }
-    private val mutableBluetoothEnabledData = MutableStateFlow<BluetoothState>(BluetoothState.BluetoothIsDisabled)
-    override val bluetoothIsEnabledData: StateFlow<BluetoothState>
+    private val mutableBluetoothEnabledData = MutableStateFlow(false)
+    override val bluetoothIsEnabledData: StateFlow<Boolean>
         get() = mutableBluetoothEnabledData
     override val bluetoothStateBroadcastReceiver = BluetoothStateBroadcastReceiver(this)
 
-    init {
-        context.registerReceiver(bluetoothStateBroadcastReceiver, IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED))
+    override fun initBluetooth(permissionIsGranted: Boolean) {
+        if (permissionIsGranted) {
+            mutableBluetoothEnabledData.value = bluetoothAdapter.isEnabled
+        }
     }
 
     override fun onBluetoothStateChanged(bluetoothIsEnabled: Boolean) {
-        mutableBluetoothEnabledData.value = if (bluetoothIsEnabled) BluetoothState.BluetoothIsEnabled
-        else BluetoothState.BluetoothIsDisabled
+        mutableBluetoothEnabledData.value = bluetoothIsEnabled
+    }
+
+    override fun registerReceiver() {
+        context.registerReceiver(bluetoothStateBroadcastReceiver, IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED))
     }
 
     override fun unregisterReceiver() {
         context.unregisterReceiver(bluetoothStateBroadcastReceiver)
     }
 
-    fun switchBluetooth() {
-        if (bluetoothAdapter == null) mutableBluetoothEnabledData.value = BluetoothState.BluetoothError
-        else
+    @SuppressLint("MissingPermission")
+    override fun disableBluetooth() {
+        if (VERSION.SDK_INT <= Build.VERSION_CODES.S) bluetoothAdapter.disable()
     }
 
 }

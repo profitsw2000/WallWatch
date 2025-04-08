@@ -34,41 +34,28 @@ import ru.profitsw2000.updatescreen.R
 import ru.profitsw2000.updatescreen.databinding.FragmentUpdateTimeBinding
 import ru.profitsw2000.updatescreen.presentation.viewmodel.UpdateTimeViewModel
 
-class UpdateTimeFragment : Fragment(), OnBluetoothStateListener {
+class UpdateTimeFragment : Fragment() {
 
     private var _binding: FragmentUpdateTimeBinding? = null
     private val binding get() = _binding!!
     private val updateTimeViewModel: UpdateTimeViewModel by viewModel()
-    private val bluetoothAdapter: BluetoothAdapter by inject()
-    //private val bluetoothStateBroadcastReceiver = BluetoothStateBroadcastReceiver(this)
     private var isConnected = false
     private var bluetoothIsEnabled = false
-/*    private val bluetoothManager: BluetoothManager by lazy {
-        requireActivity().getSystemService(BluetoothManager::class.java)
-    }
-    private val bluetoothAdapter: BluetoothAdapter by lazy {
-        bluetoothManager.adapter
-    }*/
     private val requestCodeForEnable = 1
     private val requestPermissionLauncher = registerForActivityResult(
             ActivityResultContracts.RequestPermission()
         ) { isGranted: Boolean ->
             if (isGranted) {
-                if (VERSION.SDK_INT > VERSION_CODES.S) switchBluetoothOn()
-                else switchBluetooth()
+                switchBluetooth()
             } else {
                 showRationaleDialog()
             }
         }
 
-    @RequiresApi(VERSION_CODES.TIRAMISU)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        updateTimeViewModel.initBluetooth(bluetoothPermissionIsGranted())
         setHasOptionsMenu(true)
-/*        requireActivity().registerReceiver(
-            bluetoothStateBroadcastReceiver,
-            IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED)
-        )*/
     }
 
     override fun onCreateView(
@@ -96,7 +83,7 @@ class UpdateTimeFragment : Fragment(), OnBluetoothStateListener {
                 true
             }
             R.id.bluetooth -> {
-                //bluetoothOperation()
+                bluetoothOperation()
                 true
             }
             else -> true
@@ -106,11 +93,8 @@ class UpdateTimeFragment : Fragment(), OnBluetoothStateListener {
     override fun onPrepareOptionsMenu(menu: Menu) {
         super.onPrepareOptionsMenu(menu)
 
-        if (bluetoothPermissionIsGranted())
-            if (bluetoothIsEnabled)
-                menu.findItem(R.id.bluetooth).setIcon(ru.profitsw2000.core.R.drawable.bt_on)
-            else
-                menu.findItem(R.id.bluetooth).setIcon(ru.profitsw2000.core.R.drawable.bt_off)
+        if (bluetoothIsEnabled)
+            menu.findItem(R.id.bluetooth).setIcon(ru.profitsw2000.core.R.drawable.bt_on)
         else
             menu.findItem(R.id.bluetooth).setIcon(ru.profitsw2000.core.R.drawable.bt_off)
 
@@ -145,18 +129,60 @@ class UpdateTimeFragment : Fragment(), OnBluetoothStateListener {
     }
 
     private fun observeBluetoothStateData() {
-        val observer = Observer<BluetoothState> { renderBluetoothStateData(it) }
+        val observer = Observer<Boolean> { renderBluetoothStateData(it) }
         updateTimeViewModel.bluetoothIsEnabledData.observe(viewLifecycleOwner, observer)
     }
 
-    private fun renderBluetoothStateData(bluetoothState: BluetoothState) {
-        when(bluetoothState) {
-            BluetoothState.BluetoothIsEnabled -> bluetoothIsEnabled = true
-            BluetoothState.BluetoothError -> showSimpleDialog(getString(R.string.bluetooth_on_error_info_dialog_title),
-                getString(R.string.bluetooth_on_error_info_dialog_message),
-                getString(R.string.ok_dialog_button_text))
-            BluetoothState.BluetoothIsDisabled -> bluetoothIsEnabled = false
+    private fun renderBluetoothStateData(isEnabled: Boolean) {
+        bluetoothIsEnabled = isEnabled
+        requireActivity().invalidateOptionsMenu()
+    }
+
+    private fun bluetoothOperation() {
+/*        if (bluetoothAdapter == null) {
+            MaterialAlertDialogBuilder(requireActivity())
+                .setTitle(getString(R.string.bluetooth_on_error_info_dialog_title))
+                .setMessage(getString(R.string.bluetooth_on_error_info_dialog_message))
+                .setNeutralButton(getString(R.string.ok_dialog_button_text)) { dialog, _ -> dialog.dismiss()}
+                .create()
+                .show()
+        } else {*/
+            if (VERSION.SDK_INT > VERSION_CODES.R) {
+                getBluetoothPermission()
+            } else {
+                switchBluetooth()
+            }
+        //}
+    }
+
+    private fun getBluetoothPermission() {
+        when {
+            ContextCompat.checkSelfPermission(
+                requireActivity(),
+                android.Manifest.permission.BLUETOOTH_CONNECT
+            ) == PackageManager.PERMISSION_GRANTED ->
+                switchBluetooth()
+
+            //////////////////////////////////////////////////////////////////
+
+            shouldShowRequestPermissionRationale(android.Manifest.permission.BLUETOOTH_CONNECT) -> showRationaleDialog()
+
+            //////////////////////////////////////////////////////////////////
+
+            else -> requestPermissionLauncher.launch(android.Manifest.permission.BLUETOOTH_CONNECT)
         }
+    }
+
+    private fun showRationaleDialog() {
+        showSimpleDialog(messageTitle = getString(R.string.bluetooth_permission_rationale_dialog_title),
+            messageText = getString(R.string.bluetooth_permission_rationale_dialog_text),
+            buttonText = getString(R.string.ok_dialog_button_text))
+    }
+
+    private fun showBluetoothEnablingDialog() {
+        showSimpleDialog(messageTitle = getString(R.string.bluetooth_on_warning_dialog_title),
+            messageText = getString(R.string.bluetooth_on_warning_dialog_text),
+            buttonText = getString(R.string.ok_dialog_button_text))
     }
 
     private fun showSimpleDialog(messageTitle: String,
@@ -170,75 +196,12 @@ class UpdateTimeFragment : Fragment(), OnBluetoothStateListener {
             .show()
     }
 
-    private fun bluetoothOperation() {
-        if (bluetoothAdapter == null) {
-            MaterialAlertDialogBuilder(requireActivity())
-                .setTitle(getString(R.string.bluetooth_on_error_info_dialog_title))
-                .setMessage(getString(R.string.bluetooth_on_error_info_dialog_message))
-                .setNeutralButton(getString(R.string.ok_dialog_button_text)) { dialog, _ -> dialog.dismiss()}
-                .create()
-                .show()
-        } else {
-            if (VERSION.SDK_INT > VERSION_CODES.R) {
-                getBluetoothPermission()
-            } else {
-                switchBluetooth()
-            }
-        }
-    }
-
-    private fun getBluetoothPermission() {
-        when {
-            ContextCompat.checkSelfPermission(
-                requireActivity(),
-                android.Manifest.permission.BLUETOOTH_CONNECT
-            ) == PackageManager.PERMISSION_GRANTED ->
-                if (VERSION.SDK_INT > VERSION_CODES.S) switchBluetoothOn()
-                else switchBluetooth()
-
-            //////////////////////////////////////////////////////////////////
-
-            shouldShowRequestPermissionRationale(android.Manifest.permission.BLUETOOTH_CONNECT) -> showRationaleDialog()
-
-            //////////////////////////////////////////////////////////////////
-
-            else -> requestPermissionLauncher.launch(android.Manifest.permission.BLUETOOTH_CONNECT)
-        }
-    }
-
-    private fun showRationaleDialog() {
-        MaterialAlertDialogBuilder(requireActivity())
-            .setTitle(getString(R.string.bluetooth_permission_rationale_dialog_title))
-            .setMessage(getString(R.string.bluetooth_permission_rationale_dialog_text))
-            .setNeutralButton(getString(R.string.ok_dialog_button_text)) { dialog, _ -> dialog.dismiss() }
-            .create()
-            .show()
-    }
-
-    private fun showBluetoothEnablingDialog() {
-        MaterialAlertDialogBuilder(requireActivity())
-            .setTitle(getString(R.string.bluetooth_on_warning_dialog_title))
-            .setMessage(getString(R.string.bluetooth_on_warning_dialog_text))
-            .setNeutralButton(getString(R.string.ok_dialog_button_text)) { dialog, _ -> dialog.dismiss() }
-            .create()
-            .show()
-    }
-
 
     @SuppressLint("MissingPermission")
     private fun switchBluetooth() {
-        if (bluetoothAdapter.isEnabled && VERSION.SDK_INT <= VERSION_CODES.R) {
-            bluetoothAdapter.disable()
+        if (bluetoothIsEnabled) {
+            updateTimeViewModel.disableBluetooth()
         } else {
-            val enableBtIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
-            startActivityForResult(enableBtIntent, requestCodeForEnable)
-        }
-    }
-
-
-    @SuppressLint("MissingPermission")
-    private fun switchBluetoothOn() {
-        if (!bluetoothAdapter.isEnabled) {
             val enableBtIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
             startActivityForResult(enableBtIntent, requestCodeForEnable)
         }
@@ -246,9 +209,7 @@ class UpdateTimeFragment : Fragment(), OnBluetoothStateListener {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == requestCodeForEnable) {
-            if (resultCode == Activity.RESULT_OK) {
-                requireActivity().invalidateOptionsMenu()
-            } else if (resultCode == Activity.RESULT_CANCELED) {
+            if (resultCode == Activity.RESULT_CANCELED) {
                 showBluetoothEnablingDialog()
             }
         }
@@ -266,16 +227,11 @@ class UpdateTimeFragment : Fragment(), OnBluetoothStateListener {
 
     override fun onDestroy() {
         super.onDestroy()
-        //requireActivity().unregisterReceiver(bluetoothStateBroadcastReceiver)
         _binding = null
     }
 
     companion object {
         @JvmStatic
         fun newInstance() = UpdateTimeFragment()
-    }
-
-    override fun onBluetoothStateChanged(bluetoothIsEnabled: Boolean) {
-        requireActivity().invalidateOptionsMenu()
     }
 }

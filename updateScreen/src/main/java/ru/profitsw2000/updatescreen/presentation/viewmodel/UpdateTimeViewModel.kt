@@ -14,10 +14,21 @@ class UpdateTimeViewModel(
 
     val dateLiveData: LiveData<String> = dateTimeRepository.dateDataString.asLiveData()
     val timeLiveData: LiveData<String> = dateTimeRepository.timeDataString.asLiveData()
-    val bluetoothIsEnabledData: LiveData<BluetoothState> = bluetoothRepository.bluetoothIsEnabledData.asLiveData()
+    val bluetoothIsEnabledData: LiveData<Boolean> = bluetoothRepository.bluetoothIsEnabledData.asLiveData()
 
-    fun switchBluetooth() {
+    init {
+        bluetoothRepository.registerReceiver()
+    }
 
+    fun initBluetooth(permissionIsGranted: Boolean) = bluetoothRepository.initBluetooth(permissionIsGranted)
+
+    fun disableBluetooth() {
+        bluetoothRepository.disableBluetooth()
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        bluetoothRepository.unregisterReceiver()
     }
 
 }

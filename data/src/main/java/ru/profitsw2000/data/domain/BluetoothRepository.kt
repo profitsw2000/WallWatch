@@ -6,9 +6,15 @@ import ru.profitsw2000.data.model.BluetoothState
 
 interface BluetoothRepository {
 
-    val bluetoothIsEnabledData: StateFlow<BluetoothState>
+    val bluetoothIsEnabledData: StateFlow<Boolean>
     val bluetoothStateBroadcastReceiver: BluetoothStateBroadcastReceiver
 
+    fun initBluetooth(permissionIsGranted: Boolean)
+
+    fun registerReceiver()
+
     fun unregisterReceiver()
+
+    fun disableBluetooth()
 
 }
