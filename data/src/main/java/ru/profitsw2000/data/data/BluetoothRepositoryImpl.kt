@@ -13,7 +13,6 @@ import kotlinx.coroutines.flow.StateFlow
 import ru.profitsw2000.core.utils.bluetoothbroadcastreceiver.BluetoothStateBroadcastReceiver
 import ru.profitsw2000.core.utils.bluetoothbroadcastreceiver.OnBluetoothStateListener
 import ru.profitsw2000.data.domain.BluetoothRepository
-import ru.profitsw2000.data.model.BluetoothState
 
 class BluetoothRepositoryImpl(
     private val context: Context
