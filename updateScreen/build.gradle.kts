@@ -5,6 +5,9 @@ plugins {
 
 android {
     namespace = "ru.profitsw2000.updatescreen"
+    buildFeatures {
+        viewBinding = true
+    }
 }
 
 dependencies {
@@ -21,6 +24,8 @@ dependencies {
     implementation(libs.androidx.viewmodel)
     //Koin
     implementation(libs.koin)
+    implementation(libs.androidx.legacy.support.v4)
+    implementation(libs.androidx.recyclerview)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

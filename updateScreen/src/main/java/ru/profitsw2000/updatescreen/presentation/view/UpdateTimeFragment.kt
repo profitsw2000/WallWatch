@@ -80,6 +80,7 @@ class UpdateTimeFragment : Fragment() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.connect -> {
+                startBottomSheetDialog()
                 true
             }
             R.id.bluetooth -> {
@@ -223,6 +224,11 @@ class UpdateTimeFragment : Fragment() {
                     android.Manifest.permission.BLUETOOTH_CONNECT
                 ) == PackageManager.PERMISSION_GRANTED
         } else true
+    }
+
+    private fun startBottomSheetDialog() {
+        val bluetoothPairedDevicesListFragment = BluetoothPairedDevicesListFragment()
+        bluetoothPairedDevicesListFragment.show(childFragmentManager, "devices list")
     }
 
     override fun onDestroy() {
