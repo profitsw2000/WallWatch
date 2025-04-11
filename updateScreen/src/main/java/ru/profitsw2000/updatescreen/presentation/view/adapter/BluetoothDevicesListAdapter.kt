@@ -3,9 +3,12 @@ package ru.profitsw2000.updatescreen.presentation.view.adapter
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import ru.profitsw2000.core.utils.listeners.OnDeviceNameClickListener
 import ru.profitsw2000.updatescreen.databinding.BluetoothDeviceItemViewBinding
 
-class BluetoothDevicesListAdapter() : RecyclerView.Adapter<BluetoothDevicesListAdapter.ViewHolder> () {
+class BluetoothDevicesListAdapter(
+    private val onDeviceNameClickListener: OnDeviceNameClickListener
+) : RecyclerView.Adapter<BluetoothDevicesListAdapter.ViewHolder>() {
 
     private var data: List<String> = arrayListOf()
 
@@ -20,6 +23,12 @@ class BluetoothDevicesListAdapter() : RecyclerView.Adapter<BluetoothDevicesListA
             false)
         val bluetoothDeviceViewHolder = ViewHolder(binding)
 
+        with(binding) {
+            root.setOnClickListener {
+                onDeviceNameClickListener.onClick(bluetoothDeviceViewHolder.adapterPosition)
+            }
+        }
+
         return bluetoothDeviceViewHolder
     }
 
@@ -33,7 +42,7 @@ class BluetoothDevicesListAdapter() : RecyclerView.Adapter<BluetoothDevicesListA
         holder.deviceName.text = bluetoothDeviceName
     }
 
-    inner class ViewHolder(binding: BluetoothDeviceItemViewBinding) : RecyclerView.ViewHolder(binding.root) {
+    inner class ViewHolder(private val binding: BluetoothDeviceItemViewBinding) : RecyclerView.ViewHolder(binding.root) {
         val deviceName = binding.bluetoothDeviceNameTextView
     }
 }

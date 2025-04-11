@@ -55,6 +55,7 @@ class UpdateTimeFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         updateTimeViewModel.initBluetooth(bluetoothPermissionIsGranted())
+        lifecycle.addObserver(updateTimeViewModel)
         setHasOptionsMenu(true)
     }
 

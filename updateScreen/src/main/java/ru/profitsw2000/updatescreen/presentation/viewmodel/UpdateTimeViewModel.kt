@@ -1,5 +1,7 @@
 package ru.profitsw2000.updatescreen.presentation.viewmodel
 
+import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
@@ -10,14 +12,15 @@ import ru.profitsw2000.data.model.BluetoothState
 class UpdateTimeViewModel(
     private val dateTimeRepository: DateTimeRepository,
     private val bluetoothRepository: BluetoothRepository
-) : ViewModel() {
+) : ViewModel(), DefaultLifecycleObserver {
 
     val dateLiveData: LiveData<String> = dateTimeRepository.dateDataString.asLiveData()
     val timeLiveData: LiveData<String> = dateTimeRepository.timeDataString.asLiveData()
     val bluetoothIsEnabledData: LiveData<Boolean> = bluetoothRepository.bluetoothIsEnabledData.asLiveData()
     val pairedDevicesList: LiveData<List<String>> = bluetoothRepository.bluetoothPairedDevicesStringList.asLiveData()
 
-    init {
+    override fun onStart(owner: LifecycleOwner) {
+        super.onStart(owner)
         bluetoothRepository.registerReceiver()
     }
 
@@ -31,8 +34,8 @@ class UpdateTimeViewModel(
         bluetoothRepository.getPairedDevicesStringList()
     }
 
-    override fun onCleared() {
-        super.onCleared()
+    override fun onStop(owner: LifecycleOwner) {
+        super.onStop(owner)
         bluetoothRepository.unregisterReceiver()
     }
 
