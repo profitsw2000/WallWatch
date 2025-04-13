@@ -10,7 +10,7 @@ interface BluetoothRepository {
     val bluetoothStateBroadcastReceiver: BluetoothStateBroadcastReceiver
     val bluetoothPairedDevicesStringList: StateFlow<List<String>>
 
-    fun initBluetooth(permissionIsGranted: Boolean)
+    fun initBluetooth()
 
     fun getPairedDevicesStringList()
 

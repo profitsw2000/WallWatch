@@ -6,8 +6,6 @@ import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothManager
 import android.content.Context
 import android.content.IntentFilter
-import android.os.Build
-import android.os.Build.VERSION
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import ru.profitsw2000.core.utils.bluetoothbroadcastreceiver.BluetoothStateBroadcastReceiver
@@ -32,23 +30,18 @@ class BluetoothRepositoryImpl(
     override val bluetoothPairedDevicesStringList: StateFlow<List<String>>
         get() = bluetoothPairedDevicesMutableStringList
 
-    override fun initBluetooth(permissionIsGranted: Boolean) {
-        if (permissionIsGranted) {
+    override fun initBluetooth() {
             mutableBluetoothEnabledData.value = bluetoothAdapter.isEnabled
-        }
     }
 
     @SuppressLint("MissingPermission")
     override fun getPairedDevicesStringList() {
-        if (bluetoothAdapter.isEnabled) {
-            val pairedDevices: Set<BluetoothDevice>? = bluetoothAdapter.bondedDevices
-            val pairedDevicesNameList = arrayListOf<String>()
-            pairedDevices?.forEach { device ->
-                pairedDevicesNameList.add(device.name)
-            }
-            bluetoothPairedDevicesMutableStringList.value = pairedDevicesNameList
+        val pairedDevices: Set<BluetoothDevice>? = bluetoothAdapter.bondedDevices
+        val pairedDevicesNameList = arrayListOf<String>()
+        pairedDevices?.forEach { device ->
+            pairedDevicesNameList.add(device.name)
         }
-
+        bluetoothPairedDevicesMutableStringList.value = pairedDevicesNameList
     }
 
     override fun onBluetoothStateChanged(bluetoothIsEnabled: Boolean) {
@@ -65,7 +58,8 @@ class BluetoothRepositoryImpl(
 
     @SuppressLint("MissingPermission")
     override fun disableBluetooth() {
-        if (VERSION.SDK_INT <= Build.VERSION_CODES.S) bluetoothAdapter.disable()
+        bluetoothAdapter.disable()
+        bluetoothPairedDevicesMutableStringList.value = listOf()
     }
 
 }

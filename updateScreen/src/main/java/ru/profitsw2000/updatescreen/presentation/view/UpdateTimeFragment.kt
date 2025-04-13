@@ -141,20 +141,11 @@ class UpdateTimeFragment : Fragment() {
     }
 
     private fun bluetoothOperation() {
-/*        if (bluetoothAdapter == null) {
-            MaterialAlertDialogBuilder(requireActivity())
-                .setTitle(getString(R.string.bluetooth_on_error_info_dialog_title))
-                .setMessage(getString(R.string.bluetooth_on_error_info_dialog_message))
-                .setNeutralButton(getString(R.string.ok_dialog_button_text)) { dialog, _ -> dialog.dismiss()}
-                .create()
-                .show()
-        } else {*/
-            if (VERSION.SDK_INT > VERSION_CODES.R) {
-                getBluetoothPermission()
-            } else {
-                switchBluetooth()
-            }
-        //}
+        if (VERSION.SDK_INT > VERSION_CODES.R) {
+            getBluetoothPermission()
+        } else {
+            switchBluetooth()
+        }
     }
 
     private fun getBluetoothPermission() {

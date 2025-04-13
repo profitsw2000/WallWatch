@@ -1,5 +1,7 @@
 package ru.profitsw2000.updatescreen.presentation.viewmodel
 
+import android.os.Build
+import android.os.Build.VERSION
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
@@ -24,14 +26,18 @@ class UpdateTimeViewModel(
         bluetoothRepository.registerReceiver()
     }
 
-    fun initBluetooth(permissionIsGranted: Boolean) = bluetoothRepository.initBluetooth(permissionIsGranted)
+    fun initBluetooth(permissionIsGranted: Boolean) {
+        if (permissionIsGranted) bluetoothRepository.initBluetooth()
+    }
 
     fun disableBluetooth() {
-        bluetoothRepository.disableBluetooth()
+        if (VERSION.SDK_INT <= Build.VERSION_CODES.S) bluetoothRepository.disableBluetooth()
     }
 
     fun getPairedDevicesStringList() {
-        bluetoothRepository.getPairedDevicesStringList()
+        if (bluetoothIsEnabledData.value == true) {
+            bluetoothRepository.getPairedDevicesStringList()
+        }
     }
 
     override fun onStop(owner: LifecycleOwner) {
