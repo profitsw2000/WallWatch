@@ -6,6 +6,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.coordinatorlayout.widget.CoordinatorLayout
+import androidx.core.os.bundleOf
+import androidx.fragment.app.setFragmentResult
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -24,7 +26,10 @@ class BluetoothPairedDevicesListFragment : BottomSheetDialogFragment() {
         BluetoothDevicesListAdapter(
             onDeviceNameClickListener = object : OnDeviceNameClickListener{
                 override fun onClick(index: Int) {
-                    Toast.makeText(requireActivity(), "Device number $index selected", Toast.LENGTH_SHORT).show()
+                    setFragmentResult(REQUEST_KEY,
+                        bundleOf(RESULT_EXTRA_KEY to index)
+                    )
+                    //Toast.makeText(requireActivity(), "Device number $index selected", Toast.LENGTH_SHORT).show()
                     this@BluetoothPairedDevicesListFragment.dismiss()
                 }
             }
@@ -64,7 +69,7 @@ class BluetoothPairedDevicesListFragment : BottomSheetDialogFragment() {
 
     private fun observeData() {
         val observer = Observer<List<String>> { adapter.setData(it) }
-        updateTimeViewModel.pairedDevicesList.observe(viewLifecycleOwner, observer)
+        updateTimeViewModel.pairedDevicesStringList.observe(viewLifecycleOwner, observer)
     }
 
     override fun onDestroyView() {
@@ -73,6 +78,9 @@ class BluetoothPairedDevicesListFragment : BottomSheetDialogFragment() {
     }
 
     companion object {
+        const val REQUEST_KEY = "device_key"
+        const val RESULT_EXTRA_KEY = "extra_key"
+
         @JvmStatic
         fun newInstance() = BluetoothPairedDevicesListFragment()
     }

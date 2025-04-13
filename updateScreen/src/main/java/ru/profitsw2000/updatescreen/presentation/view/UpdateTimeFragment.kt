@@ -23,12 +23,14 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.setFragmentResultListener
 import androidx.lifecycle.Observer
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import ru.profitsw2000.core.utils.bluetoothbroadcastreceiver.BluetoothStateBroadcastReceiver
 import ru.profitsw2000.core.utils.bluetoothbroadcastreceiver.OnBluetoothStateListener
+import ru.profitsw2000.data.model.BluetoothConnectionStatus
 import ru.profitsw2000.data.model.BluetoothState
 import ru.profitsw2000.updatescreen.R
 import ru.profitsw2000.updatescreen.databinding.FragmentUpdateTimeBinding
@@ -39,7 +41,6 @@ class UpdateTimeFragment : Fragment() {
     private var _binding: FragmentUpdateTimeBinding? = null
     private val binding get() = _binding!!
     private val updateTimeViewModel: UpdateTimeViewModel by viewModel()
-    private var isConnected = false
     private var bluetoothIsEnabled = false
     private val requestCodeForEnable = 1
     private val requestPermissionLauncher = registerForActivityResult(
@@ -54,6 +55,10 @@ class UpdateTimeFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setFragmentResultListener(BluetoothPairedDevicesListFragment.REQUEST_KEY) { _, bundle ->
+            val selectedDeviceIndex = bundle.getInt(BluetoothPairedDevicesListFragment.RESULT_EXTRA_KEY)
+            updateTimeViewModel.connectSelectedDevice(selectedDeviceIndex)
+        }
         updateTimeViewModel.initBluetooth(bluetoothPermissionIsGranted())
         lifecycle.addObserver(updateTimeViewModel)
         setHasOptionsMenu(true)
@@ -81,7 +86,7 @@ class UpdateTimeFragment : Fragment() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.connect -> {
-                startBottomSheetDialog()
+                updateTimeViewModel.deviceConnection()
                 true
             }
             R.id.bluetooth -> {
@@ -100,16 +105,14 @@ class UpdateTimeFragment : Fragment() {
         else
             menu.findItem(R.id.bluetooth).setIcon(ru.profitsw2000.core.R.drawable.bt_off)
 
-        if (isConnected)
-            menu.findItem(R.id.connect).setIcon(ru.profitsw2000.core.R.drawable.connected)
-        else
-            menu.findItem(R.id.connect).setIcon(ru.profitsw2000.core.R.drawable.unconnected)
+        menu.findItem(R.id.connect).setIcon(getResourceId(updateTimeViewModel.bluetoothConnectionStatus.value))
     }
 
     private fun observeData() {
         observeDateData()
         observeTimeData()
         observeBluetoothStateData()
+        observeBluetoothConnectionStatus()
     }
 
     private fun observeDateData() {
@@ -138,6 +141,44 @@ class UpdateTimeFragment : Fragment() {
     private fun renderBluetoothStateData(isEnabled: Boolean) {
         bluetoothIsEnabled = isEnabled
         requireActivity().invalidateOptionsMenu()
+    }
+
+    private fun observeBluetoothConnectionStatus() {
+        val observer = Observer<BluetoothConnectionStatus> { renderBluetoothConnectionStatusData(it) }
+        updateTimeViewModel.bluetoothConnectionStatus.observe(viewLifecycleOwner, observer)
+    }
+
+    private fun renderBluetoothConnectionStatusData(bluetoothConnectionStatus: BluetoothConnectionStatus) {
+        when(bluetoothConnectionStatus) {
+            BluetoothConnectionStatus.Connected -> setButtonState(true)
+            BluetoothConnectionStatus.Connecting -> setButtonState(false)
+            BluetoothConnectionStatus.DeviceSelection -> startBottomSheetDialog()
+            BluetoothConnectionStatus.Disconnected -> setButtonState(false)
+            BluetoothConnectionStatus.Failed -> setButtonState(false)
+        }
+        requireActivity().invalidateOptionsMenu()
+    }
+
+    private fun startBottomSheetDialog() {
+        val bluetoothPairedDevicesListFragment = BluetoothPairedDevicesListFragment()
+
+        setButtonState(false)
+        bluetoothPairedDevicesListFragment.show(childFragmentManager, "devices list")
+    }
+
+    private fun setButtonState(isEnabled: Boolean) = with(binding) {
+        updateTimeButton.isEnabled = isEnabled
+    }
+
+    private fun getResourceId(bluetoothConnectionStatus: BluetoothConnectionStatus?): Int {
+        return when(bluetoothConnectionStatus){
+            BluetoothConnectionStatus.Connected -> ru.profitsw2000.core.R.drawable.icon_connected
+            BluetoothConnectionStatus.Connecting -> ru.profitsw2000.core.R.drawable.icon_connecting
+            BluetoothConnectionStatus.DeviceSelection -> ru.profitsw2000.core.R.drawable.icon_connecting
+            BluetoothConnectionStatus.Disconnected -> ru.profitsw2000.core.R.drawable.icon_disonnected
+            BluetoothConnectionStatus.Failed -> ru.profitsw2000.core.R.drawable.icon_failed
+            else -> ru.profitsw2000.core.R.drawable.icon_disonnected
+        }
     }
 
     private fun bluetoothOperation() {
@@ -216,11 +257,6 @@ class UpdateTimeFragment : Fragment() {
                     android.Manifest.permission.BLUETOOTH_CONNECT
                 ) == PackageManager.PERMISSION_GRANTED
         } else true
-    }
-
-    private fun startBottomSheetDialog() {
-        val bluetoothPairedDevicesListFragment = BluetoothPairedDevicesListFragment()
-        bluetoothPairedDevicesListFragment.show(childFragmentManager, "devices list")
     }
 
     override fun onDestroy() {
