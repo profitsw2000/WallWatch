@@ -1,5 +1,6 @@
 package ru.profitsw2000.updatescreen.presentation.view
 
+import android.content.DialogInterface
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -29,7 +30,6 @@ class BluetoothPairedDevicesListFragment : BottomSheetDialogFragment() {
                     setFragmentResult(REQUEST_KEY,
                         bundleOf(RESULT_EXTRA_KEY to index)
                     )
-                    //Toast.makeText(requireActivity(), "Device number $index selected", Toast.LENGTH_SHORT).show()
                     this@BluetoothPairedDevicesListFragment.dismiss()
                 }
             }
@@ -77,9 +77,18 @@ class BluetoothPairedDevicesListFragment : BottomSheetDialogFragment() {
         _binding = null
     }
 
+/*    override fun onCancel(dialog: DialogInterface) {
+        super.onCancel(dialog)
+        setFragmentResult(REQUEST_KEY,
+            bundleOf(RESULT_CANCEL to false)
+        )
+        //Toast.makeText(requireActivity(), "onCancel!!!!", Toast.LENGTH_SHORT).show()
+    }*/
+
     companion object {
         const val REQUEST_KEY = "device_key"
         const val RESULT_EXTRA_KEY = "extra_key"
+        const val RESULT_CANCEL = "cancel_key"
 
         @JvmStatic
         fun newInstance() = BluetoothPairedDevicesListFragment()

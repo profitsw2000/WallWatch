@@ -163,7 +163,7 @@ class UpdateTimeFragment : Fragment() {
         val bluetoothPairedDevicesListFragment = BluetoothPairedDevicesListFragment()
 
         setButtonState(false)
-        bluetoothPairedDevicesListFragment.show(childFragmentManager, "devices list")
+        bluetoothPairedDevicesListFragment.show(parentFragmentManager, "devices list")
     }
 
     private fun setButtonState(isEnabled: Boolean) = with(binding) {
@@ -174,7 +174,7 @@ class UpdateTimeFragment : Fragment() {
         return when(bluetoothConnectionStatus){
             BluetoothConnectionStatus.Connected -> ru.profitsw2000.core.R.drawable.icon_connected
             BluetoothConnectionStatus.Connecting -> ru.profitsw2000.core.R.drawable.icon_connecting
-            BluetoothConnectionStatus.DeviceSelection -> ru.profitsw2000.core.R.drawable.icon_connecting
+            BluetoothConnectionStatus.DeviceSelection -> ru.profitsw2000.core.R.drawable.icon_disonnected
             BluetoothConnectionStatus.Disconnected -> ru.profitsw2000.core.R.drawable.icon_disonnected
             BluetoothConnectionStatus.Failed -> ru.profitsw2000.core.R.drawable.icon_failed
             else -> ru.profitsw2000.core.R.drawable.icon_disonnected

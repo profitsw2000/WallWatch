@@ -51,6 +51,7 @@ class BluetoothRepositoryImpl(
     private val bluetoothPairedDevicesMutableList = MutableStateFlow<List<BluetoothDevice>>(listOf())
     override val bluetoothPairedDevicesList: StateFlow<List<BluetoothDevice>>
         get() = bluetoothPairedDevicesMutableList
+    override var bluetoothPairedDevicesList1: List<BluetoothDevice> = listOf()
 
     override fun initBluetooth() {
             mutableBluetoothEnabledData.value = bluetoothAdapter.isEnabled
@@ -63,10 +64,11 @@ class BluetoothRepositoryImpl(
         val pairedDevicesList = arrayListOf<BluetoothDevice>()
         pairedDevices?.forEach { device ->
             pairedDevicesNameList.add(device.name)
-
+            pairedDevicesList.add(device)
         }
         bluetoothPairedDevicesMutableStringList.value = pairedDevicesNameList
         bluetoothPairedDevicesMutableList.value = pairedDevicesList
+        bluetoothPairedDevicesList1 = pairedDevicesList
     }
 
     @SuppressLint("MissingPermission")
@@ -76,7 +78,6 @@ class BluetoothRepositoryImpl(
 
         val deferred: Deferred<BluetoothConnectionStatus> = coroutineScope.async {
             try {
-                bluetoothAdapter.cancelDiscovery()
                 bluetoothSocket.let {
                     bluetoothSocket.connect()
                 }

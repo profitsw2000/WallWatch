@@ -4,7 +4,7 @@
 
     <item
         android:id="@+id/connect"
-        android:icon="@drawable/unconnected"
+        android:icon="@drawable/icon_disonnected"
         android:title="Connect"
         app:showAsAction="always"/>
 

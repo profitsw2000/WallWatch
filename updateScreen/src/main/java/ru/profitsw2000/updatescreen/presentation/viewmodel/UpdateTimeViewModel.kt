@@ -1,5 +1,6 @@
 package ru.profitsw2000.updatescreen.presentation.viewmodel
 
+import android.annotation.SuppressLint
 import android.bluetooth.BluetoothDevice
 import android.os.Build
 import android.os.Build.VERSION
@@ -9,6 +10,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
+import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -24,12 +26,12 @@ class UpdateTimeViewModel(
     private val bluetoothRepository: BluetoothRepository
 ) : ViewModel(), DefaultLifecycleObserver {
 
-    private val coroutineScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
     val dateLiveData: LiveData<String> = dateTimeRepository.dateDataString.asLiveData()
     val timeLiveData: LiveData<String> = dateTimeRepository.timeDataString.asLiveData()
     val bluetoothIsEnabledData: LiveData<Boolean> = bluetoothRepository.bluetoothIsEnabledData.asLiveData()
     val pairedDevicesStringList: LiveData<List<String>> = bluetoothRepository.bluetoothPairedDevicesStringList.asLiveData()
     private val pairedDevicesList: LiveData<List<BluetoothDevice>> = bluetoothRepository.bluetoothPairedDevicesList.asLiveData()
+    private val pairedDevicesList1: List<BluetoothDevice> = bluetoothRepository.bluetoothPairedDevicesList1
     private var _bluetoothConnectionStatus: MutableLiveData<BluetoothConnectionStatus> = MutableLiveData(BluetoothConnectionStatus.Disconnected)
     val bluetoothConnectionStatus by this::_bluetoothConnectionStatus
 
@@ -42,31 +44,39 @@ class UpdateTimeViewModel(
         if (permissionIsGranted) bluetoothRepository.initBluetooth()
     }
 
+    @SuppressLint("SuspiciousIndentation")
     fun disableBluetooth() {
-        if (VERSION.SDK_INT <= Build.VERSION_CODES.S) bluetoothRepository.disableBluetooth()
+        if (VERSION.SDK_INT <= Build.VERSION_CODES.S){
+            if (bluetoothConnectionStatus.value == BluetoothConnectionStatus.Disconnected ||
+                bluetoothConnectionStatus.value == BluetoothConnectionStatus.Failed)
+            bluetoothRepository.disableBluetooth()
+        }
     }
 
     fun deviceConnection() {
         if (bluetoothIsEnabledData.value == true) {
             when(bluetoothConnectionStatus.value) {
                 BluetoothConnectionStatus.Disconnected -> bluetoothConnectionStatus.value = BluetoothConnectionStatus.DeviceSelection
+                BluetoothConnectionStatus.DeviceSelection -> bluetoothConnectionStatus.value = BluetoothConnectionStatus.DeviceSelection
                 BluetoothConnectionStatus.Connected -> disconnectDevice()
-                BluetoothConnectionStatus.Failed -> bluetoothConnectionStatus.value = BluetoothConnectionStatus.Failed
+                BluetoothConnectionStatus.Failed -> bluetoothConnectionStatus.value = BluetoothConnectionStatus.DeviceSelection
                 else -> {}
             }
         }
     }
 
-    fun connectSelectedDevice(deviceIndex: Int) {
-        coroutineScope.launch {
-            pairedDevicesList.value?.let {
-                _bluetoothConnectionStatus.value = bluetoothRepository.connectDevice(it.get(deviceIndex))
+    fun connectSelectedDevice(deviceIndex: Int?) {
+        if (deviceIndex != null) {
+            val device = bluetoothRepository.bluetoothPairedDevicesList1[deviceIndex]
+            viewModelScope.launch {
+                _bluetoothConnectionStatus.value = bluetoothRepository.connectDevice(device)
             }
-        }
+        } else
+            bluetoothConnectionStatus.value = BluetoothConnectionStatus.Disconnected
     }
 
     private fun disconnectDevice() {
-        coroutineScope.launch {
+        viewModelScope.launch {
             bluetoothRepository.disconnectDevice()
         }
     }
