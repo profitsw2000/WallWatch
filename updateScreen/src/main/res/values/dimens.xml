@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="main_constraint_layout_padding">32dp</dimen>
+    <dimen name="wall_watch_constraint_layout_vertical_padding">6dp</dimen>
+    <dimen name="wall_watch_time_digits_text_size">64sp</dimen>
+    <dimen name="wall_watch_date_digits_text_size">18sp</dimen>
+    <dimen name="scaff_gap_padding">2dp</dimen>
+    <dimen name="scaff_button_half_internal_padding">8dp</dimen>
+    <dimen name="list_item_spacing">16dp</dimen>
+    <dimen name="list_item_spacing_half">8dp</dimen>
+</resources>

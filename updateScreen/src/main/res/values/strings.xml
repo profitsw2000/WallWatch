@@ -1,0 +1,14 @@
+<resources>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="default_wall_watch_time_text">22 : 34 : 56</string>
+    <string name="default_wall_watch_date_text">25.03 Вт</string>
+    <string name="update_button_text">ОБНОВИТЬ</string>
+    <string name="bluetooth_on_error_info_dialog_title">Ошибка включения Bluetooth</string>
+    <string name="bluetooth_on_error_info_dialog_message">Bluetooth на данном устройстве отсутствует</string>
+    <string name="ok_dialog_button_text">OK</string>
+    <string name="bluetooth_permission_rationale_dialog_title">Разрешение Bluetooth</string>
+    <string name="bluetooth_permission_rationale_dialog_text">При подключении к настенным часам используется Bluetooth. Для синхронизации отображаемого на настенных часах времени необходимо предоставить приложению разрешение на использование Bluetooth.</string>
+    <string name="bluetooth_on_warning_dialog_title">Включение Bluetooth</string>
+    <string name="bluetooth_on_warning_dialog_text">Для синхронизации отображаемого на настенных часах времени необходимо включить Bluetooth.</string>
+</resources>

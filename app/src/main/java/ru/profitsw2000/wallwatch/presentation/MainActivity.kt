@@ -1,18 +1,14 @@
 package ru.profitsw2000.wallwatch.presentation
 
+import android.app.Activity
 import android.os.Bundle
-import com.google.android.material.snackbar.Snackbar
 import androidx.appcompat.app.AppCompatActivity
-import androidx.navigation.findNavController
-import androidx.navigation.ui.AppBarConfiguration
-import androidx.navigation.ui.navigateUp
-import androidx.navigation.ui.setupActionBarWithNavController
+import ru.profitsw2000.updatescreen.presentation.view.UpdateTimeFragment
 import ru.profitsw2000.wallwatch.R
 import ru.profitsw2000.wallwatch.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityMainBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -20,5 +16,11 @@ class MainActivity : AppCompatActivity() {
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        supportFragmentManager.apply {
+            beginTransaction()
+                .replace(R.id.fragment_container, UpdateTimeFragment.newInstance())
+                .commit()
+        }
     }
 }
