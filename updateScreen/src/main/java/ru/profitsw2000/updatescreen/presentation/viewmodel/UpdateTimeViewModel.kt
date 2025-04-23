@@ -10,16 +10,12 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
-import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import ru.profitsw2000.data.domain.BluetoothRepository
 import ru.profitsw2000.data.domain.DateTimeRepository
 import ru.profitsw2000.data.model.BluetoothConnectionStatus
-import ru.profitsw2000.data.model.BluetoothState
 
 class UpdateTimeViewModel(
     private val dateTimeRepository: DateTimeRepository,
@@ -30,10 +26,11 @@ class UpdateTimeViewModel(
     val timeLiveData: LiveData<String> = dateTimeRepository.timeDataString.asLiveData()
     val bluetoothIsEnabledData: LiveData<Boolean> = bluetoothRepository.bluetoothIsEnabledData.asLiveData()
     val pairedDevicesStringList: LiveData<List<String>> = bluetoothRepository.bluetoothPairedDevicesStringList.asLiveData()
-    private val pairedDevicesList: LiveData<List<BluetoothDevice>> = bluetoothRepository.bluetoothPairedDevicesList.asLiveData()
-    private val pairedDevicesList1: List<BluetoothDevice> = bluetoothRepository.bluetoothPairedDevicesList1
+    private lateinit var pairedDevicesList: List<BluetoothDevice>
     private var _bluetoothConnectionStatus: MutableLiveData<BluetoothConnectionStatus> = MutableLiveData(BluetoothConnectionStatus.Disconnected)
     val bluetoothConnectionStatus by this::_bluetoothConnectionStatus
+    private val scope = CoroutineScope(Dispatchers.Main)
+
 
     override fun onStart(owner: LifecycleOwner) {
         super.onStart(owner)
@@ -65,25 +62,27 @@ class UpdateTimeViewModel(
         }
     }
 
-    fun connectSelectedDevice(deviceIndex: Int?) {
-        if (deviceIndex != null) {
-            val device = bluetoothRepository.bluetoothPairedDevicesList1[deviceIndex]
-            viewModelScope.launch {
-                _bluetoothConnectionStatus.value = bluetoothRepository.connectDevice(device)
-            }
-        } else
-            bluetoothConnectionStatus.value = BluetoothConnectionStatus.Disconnected
+    fun setCurrentState(bluetoothConnectionStatus: BluetoothConnectionStatus) {
+        _bluetoothConnectionStatus.value = bluetoothConnectionStatus
+    }
+
+    fun connectSelectedDevice(index: Int) {
+        _bluetoothConnectionStatus.value = BluetoothConnectionStatus.Connecting
+        val device = pairedDevicesList[index]
+        scope.launch {
+            _bluetoothConnectionStatus.value = bluetoothRepository.connectDevice(device)
+        }
     }
 
     private fun disconnectDevice() {
-        viewModelScope.launch {
-            bluetoothRepository.disconnectDevice()
+        scope.launch {
+            _bluetoothConnectionStatus.value = bluetoothRepository.disconnectDevice()
         }
     }
 
     fun getPairedDevicesStringList() {
         if (bluetoothIsEnabledData.value == true) {
-            bluetoothRepository.getPairedDevicesStringList()
+            pairedDevicesList = bluetoothRepository.getPairedDevicesStringList()
         }
     }
 
@@ -91,5 +90,4 @@ class UpdateTimeViewModel(
         super.onStop(owner)
         bluetoothRepository.unregisterReceiver()
     }
-
 }

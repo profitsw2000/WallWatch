@@ -1,6 +1,7 @@
 package ru.profitsw2000.data.domain
 
 import android.bluetooth.BluetoothDevice
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.StateFlow
 import ru.profitsw2000.core.utils.bluetoothbroadcastreceiver.BluetoothStateBroadcastReceiver
 import ru.profitsw2000.data.model.BluetoothConnectionStatus
@@ -11,12 +12,10 @@ interface BluetoothRepository {
     val bluetoothIsEnabledData: StateFlow<Boolean>
     val bluetoothStateBroadcastReceiver: BluetoothStateBroadcastReceiver
     val bluetoothPairedDevicesStringList: StateFlow<List<String>>
-    val bluetoothPairedDevicesList: StateFlow<List<BluetoothDevice>>
-    var bluetoothPairedDevicesList1: List<BluetoothDevice>
 
     fun initBluetooth()
 
-    fun getPairedDevicesStringList()
+    fun getPairedDevicesStringList(): List<BluetoothDevice>
 
     suspend fun connectDevice(device: BluetoothDevice): BluetoothConnectionStatus
 

@@ -2,6 +2,7 @@ package ru.profitsw2000.updatescreen.presentation.view
 
 import android.content.DialogInterface
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -20,6 +21,7 @@ import ru.profitsw2000.updatescreen.presentation.view.adapter.BluetoothDevicesLi
 import ru.profitsw2000.updatescreen.presentation.viewmodel.UpdateTimeViewModel
 
 class BluetoothPairedDevicesListFragment : BottomSheetDialogFragment() {
+    private val TAG = "VVV"
     private var _binding: FragmentBluetoothPairedDevicesListBinding? = null
     private val binding get() = _binding!!
     private val updateTimeViewModel: UpdateTimeViewModel by viewModel()
@@ -77,18 +79,16 @@ class BluetoothPairedDevicesListFragment : BottomSheetDialogFragment() {
         _binding = null
     }
 
-/*    override fun onCancel(dialog: DialogInterface) {
+    override fun onCancel(dialog: DialogInterface) {
         super.onCancel(dialog)
         setFragmentResult(REQUEST_KEY,
-            bundleOf(RESULT_CANCEL to false)
+            bundleOf(RESULT_EXTRA_KEY to -1)
         )
-        //Toast.makeText(requireActivity(), "onCancel!!!!", Toast.LENGTH_SHORT).show()
-    }*/
+    }
 
     companion object {
         const val REQUEST_KEY = "device_key"
         const val RESULT_EXTRA_KEY = "extra_key"
-        const val RESULT_CANCEL = "cancel_key"
 
         @JvmStatic
         fun newInstance() = BluetoothPairedDevicesListFragment()

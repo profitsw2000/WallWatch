@@ -7,6 +7,7 @@ import android.bluetooth.BluetoothManager
 import android.bluetooth.BluetoothSocket
 import android.content.Context
 import android.content.IntentFilter
+import android.util.Log
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
@@ -26,9 +27,9 @@ class BluetoothRepositoryImpl(
 ) : BluetoothRepository, OnBluetoothStateListener {
 
     private val MY_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB")
-    private val coroutineScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
     private lateinit var bluetoothDevice: BluetoothDevice
     private lateinit var bluetoothSocket: BluetoothSocket
+    private val coroutineScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
 
     private val bluetoothManager: BluetoothManager by lazy {
         context.getSystemService(BluetoothManager::class.java)
@@ -48,17 +49,12 @@ class BluetoothRepositoryImpl(
     override val bluetoothPairedDevicesStringList: StateFlow<List<String>>
         get() = bluetoothPairedDevicesMutableStringList
 
-    private val bluetoothPairedDevicesMutableList = MutableStateFlow<List<BluetoothDevice>>(listOf())
-    override val bluetoothPairedDevicesList: StateFlow<List<BluetoothDevice>>
-        get() = bluetoothPairedDevicesMutableList
-    override var bluetoothPairedDevicesList1: List<BluetoothDevice> = listOf()
-
     override fun initBluetooth() {
             mutableBluetoothEnabledData.value = bluetoothAdapter.isEnabled
     }
 
     @SuppressLint("MissingPermission")
-    override fun getPairedDevicesStringList() {
+    override fun getPairedDevicesStringList(): List<BluetoothDevice> {
         val pairedDevices: Set<BluetoothDevice>? = bluetoothAdapter.bondedDevices
         val pairedDevicesNameList = arrayListOf<String>()
         val pairedDevicesList = arrayListOf<BluetoothDevice>()
@@ -67,8 +63,7 @@ class BluetoothRepositoryImpl(
             pairedDevicesList.add(device)
         }
         bluetoothPairedDevicesMutableStringList.value = pairedDevicesNameList
-        bluetoothPairedDevicesMutableList.value = pairedDevicesList
-        bluetoothPairedDevicesList1 = pairedDevicesList
+        return pairedDevicesList
     }
 
     @SuppressLint("MissingPermission")

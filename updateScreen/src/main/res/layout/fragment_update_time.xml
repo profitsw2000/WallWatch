@@ -61,12 +61,25 @@
             android:background="@drawable/italy_nuts_half"
             android:layout_marginRight="@dimen/scaff_gap_padding"
             android:layout_marginBottom="@dimen/scaff_gap_padding"
+            android:padding="@dimen/scaff_button_half_internal_padding"
             app:layout_constraintBottom_toTopOf="@+id/scaff_bottom_part_constraint_layout"
             app:layout_constraintEnd_toStartOf="@id/scaff_right_part_constraint_layout"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_weight="10"
-            app:layout_constraintVertical_chainStyle="packed" />
+            app:layout_constraintVertical_chainStyle="packed">
+
+            <ProgressBar
+                android:id="@+id/progress_bar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:indeterminateTint="@color/green"
+                android:visibility="gone"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/scaff_right_part_constraint_layout"
