@@ -29,7 +29,7 @@ class DateTimeRepositoryImpl : DateTimeRepository {
         startDateTimeFlow()
     }
 
-    fun getCurrentDateTimeArray(): Array<Int> {
+    override fun getCurrentDateTimeArray(): Array<Int> {
         val dayOfWeek =
             if (calendar.get(Calendar.DAY_OF_WEEK) - 1 < 1) 7
             else calendar.get(Calendar.DAY_OF_WEEK) - 1

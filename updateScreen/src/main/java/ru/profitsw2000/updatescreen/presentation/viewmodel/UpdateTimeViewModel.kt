@@ -80,10 +80,27 @@ class UpdateTimeViewModel(
         }
     }
 
+    fun updateTime() {
+
+    }
+
     fun getPairedDevicesStringList() {
         if (bluetoothIsEnabledData.value == true) {
             pairedDevicesList = bluetoothRepository.getPairedDevicesStringList()
         }
+    }
+
+    private fun getDateTimePacket(): ByteArray {
+        val packet: ByteArray = ByteArray(9)
+        var checkSum: Int = 0xCC
+        packet[0] = checkSum as Byte
+
+        dateTimeRepository.getCurrentDateTimeArray().forEachIndexed { index, i ->
+            packet[index + 1] = i as Byte
+            checkSum += i
+        }
+        packet[packet.size - 1] = checkSum
+        return packet
     }
 
     override fun onStop(owner: LifecycleOwner) {
