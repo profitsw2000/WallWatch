@@ -29,6 +29,8 @@ class UpdateTimeViewModel(
     private lateinit var pairedDevicesList: List<BluetoothDevice>
     private var _bluetoothConnectionStatus: MutableLiveData<BluetoothConnectionStatus> = MutableLiveData(BluetoothConnectionStatus.Disconnected)
     val bluetoothConnectionStatus by this::_bluetoothConnectionStatus
+    private var _bluetoothDataTransferStatus: MutableLiveData<Boolean> = MutableLiveData(true)
+    val bluetoothDataTransferStatus by this::_bluetoothDataTransferStatus
     private val scope = CoroutineScope(Dispatchers.Main)
 
 
@@ -81,7 +83,11 @@ class UpdateTimeViewModel(
     }
 
     fun updateTime() {
-
+        scope.launch {
+            _bluetoothDataTransferStatus.value = bluetoothRepository.writeByteArray(
+                getDateTimePacket()
+            )
+        }
     }
 
     fun getPairedDevicesStringList() {
