@@ -7,8 +7,11 @@
     <color name="teal_700">#FF018786</color>
     <color name="red">#FFFF0000</color>
     <color name="green">#FF00FF00</color>
+    <color name="pale_green">#A2F86F</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="deep_grey">#969494</color>
+    <color name="very_deep_grey">#575757</color>
     <color name="appBarTextColor">#FFEA5D5D</color>
     <color name="italian_nuts">#80A05A37</color>
 </resources>

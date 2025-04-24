@@ -101,6 +101,7 @@ class BluetoothRepositoryImpl(
     override suspend fun writeByteArray(byteArray: ByteArray): Boolean {
 
         return if (bluetoothSocket.isConnected) {
+            Log.d("VVV", "writeByteArray: ")
             val outputStream = bluetoothSocket.outputStream
             val deferred: Deferred<Boolean> = coroutineScope.async {
                 try {

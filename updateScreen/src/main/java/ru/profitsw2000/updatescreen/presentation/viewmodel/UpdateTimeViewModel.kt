@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.bluetooth.BluetoothDevice
 import android.os.Build
 import android.os.Build.VERSION
+import android.util.Log
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
@@ -22,6 +23,7 @@ class UpdateTimeViewModel(
     private val bluetoothRepository: BluetoothRepository
 ) : ViewModel(), DefaultLifecycleObserver {
 
+    private val TAG = "VVV"
     val dateLiveData: LiveData<String> = dateTimeRepository.dateDataString.asLiveData()
     val timeLiveData: LiveData<String> = dateTimeRepository.timeDataString.asLiveData()
     val bluetoothIsEnabledData: LiveData<Boolean> = bluetoothRepository.bluetoothIsEnabledData.asLiveData()
@@ -97,16 +99,24 @@ class UpdateTimeViewModel(
     }
 
     private fun getDateTimePacket(): ByteArray {
-        val packet: ByteArray = ByteArray(9)
-        var checkSum: Int = 0xCC
-        packet[0] = checkSum as Byte
+        val packet = ByteArray(9)
+        var checkSum = 0xCC
+        packet[0] = checkSum.toByte()
 
         dateTimeRepository.getCurrentDateTimeArray().forEachIndexed { index, i ->
-            packet[index + 1] = i as Byte
-            checkSum += i
+            packet[index + 1] = i.fromIntToBcdByte()
+            checkSum += packet[index + 1]
         }
-        packet[packet.size - 1] = checkSum
+        packet[packet.size - 1] = checkSum.toByte()
         return packet
+    }
+
+    private fun Int.fromIntToBcdByte(): Byte {
+        val dec = (this/10).shl(4)
+        val units = (this%10)
+        val result = dec.or(units).toByte()
+
+        return result
     }
 
     override fun onStop(owner: LifecycleOwner) {

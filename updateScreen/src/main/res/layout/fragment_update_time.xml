@@ -97,10 +97,11 @@
                 android:id="@+id/update_time_button"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:backgroundTint="@color/black"
-                android:textColor="@color/green"
+                android:backgroundTint="@color/update_button_background_color"
+                android:textColor="@color/update_button_text_color"
                 android:text="@string/update_button_text"
                 android:enabled="false"
+                app:rippleColor="@color/very_deep_grey"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"/>
