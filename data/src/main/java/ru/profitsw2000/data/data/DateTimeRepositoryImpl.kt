@@ -16,6 +16,7 @@ import java.util.Date
 class DateTimeRepositoryImpl : DateTimeRepository {
 
     private val coroutineScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
+    private val calendar = Calendar.getInstance()
 
     private val mutableDateDataString: MutableStateFlow<String> = MutableStateFlow(getCurrentDateString())
     override val dateDataString: StateFlow<String>
@@ -26,6 +27,22 @@ class DateTimeRepositoryImpl : DateTimeRepository {
 
     init {
         startDateTimeFlow()
+    }
+
+    fun getCurrentDateTimeArray(): Array<Int> {
+        val dayOfWeek =
+            if (calendar.get(Calendar.DAY_OF_WEEK) - 1 < 1) 7
+            else calendar.get(Calendar.DAY_OF_WEEK) - 1
+
+        return arrayOf(
+            calendar.get(Calendar.SECOND),
+            calendar.get(Calendar.MINUTE),
+            calendar.get(Calendar.HOUR_OF_DAY),
+            dayOfWeek,
+            calendar.get(Calendar.DAY_OF_MONTH),
+            calendar.get(Calendar.MONTH) + 1,
+            calendar.get(Calendar.YEAR)%100
+        )
     }
 
     private fun startDateTimeFlow() {
