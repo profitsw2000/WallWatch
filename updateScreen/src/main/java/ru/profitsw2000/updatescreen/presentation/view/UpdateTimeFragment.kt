@@ -84,6 +84,7 @@ class UpdateTimeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         observeData()
+        initButton()
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -116,11 +117,19 @@ class UpdateTimeFragment : Fragment() {
         menu.findItem(R.id.connect).setIcon(getResourceId(updateTimeViewModel.bluetoothConnectionStatus.value))
     }
 
+    private fun initButton() = with(binding) {
+        updateTimeButton.setOnClickListener {
+            if (updateTimeViewModel.bluetoothConnectionStatus.value == BluetoothConnectionStatus.Connected)
+                updateTimeViewModel.updateTime()
+        }
+    }
+
     private fun observeData() {
         observeDateData()
         observeTimeData()
         observeBluetoothStateData()
         observeBluetoothConnectionStatus()
+        observeBluetoothTransferStatusData()
     }
 
     private fun observeDateData() {
@@ -174,6 +183,20 @@ class UpdateTimeFragment : Fragment() {
             }
         }
         requireActivity().invalidateOptionsMenu()
+    }
+
+    private fun observeBluetoothTransferStatusData() {
+        val observer = Observer<Boolean> { renderBluetoothTransferStatusData(it) }
+        updateTimeViewModel.bluetoothDataTransferStatus.observe(viewLifecycleOwner, observer)
+    }
+
+    private fun renderBluetoothTransferStatusData(isSuccessful: Boolean) {
+        if (!isSuccessful) {
+            showSimpleDialog(
+                getString(R.string.bluetooth_data_transfer_error_dialog_title_text),
+                getString(R.string.bluetooth_data_transfer_error_dialog_message_text),
+                getString(R.string.ok_dialog_button_text))
+        }
     }
 
     private fun startBottomSheetDialog() {
