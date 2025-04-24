@@ -68,7 +68,7 @@ class DateTimeRepositoryImpl : DateTimeRepository {
     }
 
     private fun getDayOfWeek(): String {
-        return when(Calendar.DAY_OF_WEEK) {
+        return when(Calendar.getInstance().get(Calendar.DAY_OF_WEEK)) {
             1 -> "Вс"
             2 -> "Пн"
             3 -> "Вт"
