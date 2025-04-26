@@ -11,4 +11,6 @@
     <string name="bluetooth_permission_rationale_dialog_text">При подключении к настенным часам используется Bluetooth. Для синхронизации отображаемого на настенных часах времени необходимо предоставить приложению разрешение на использование Bluetooth.</string>
     <string name="bluetooth_on_warning_dialog_title">Включение Bluetooth</string>
     <string name="bluetooth_on_warning_dialog_text">Для синхронизации отображаемого на настенных часах времени необходимо включить Bluetooth.</string>
+    <string name="bluetooth_data_transfer_error_dialog_title_text">Ошибка</string>
+    <string name="bluetooth_data_transfer_error_dialog_message_text">При обновлении времени произошла ошибка! Проверьте подключение и повторите попытку.</string>
 </resources>

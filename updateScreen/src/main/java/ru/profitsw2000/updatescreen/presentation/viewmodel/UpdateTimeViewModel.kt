@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.bluetooth.BluetoothDevice
 import android.os.Build
 import android.os.Build.VERSION
+import android.util.Log
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
@@ -22,6 +23,7 @@ class UpdateTimeViewModel(
     private val bluetoothRepository: BluetoothRepository
 ) : ViewModel(), DefaultLifecycleObserver {
 
+    private val TAG = "VVV"
     val dateLiveData: LiveData<String> = dateTimeRepository.dateDataString.asLiveData()
     val timeLiveData: LiveData<String> = dateTimeRepository.timeDataString.asLiveData()
     val bluetoothIsEnabledData: LiveData<Boolean> = bluetoothRepository.bluetoothIsEnabledData.asLiveData()
@@ -29,6 +31,8 @@ class UpdateTimeViewModel(
     private lateinit var pairedDevicesList: List<BluetoothDevice>
     private var _bluetoothConnectionStatus: MutableLiveData<BluetoothConnectionStatus> = MutableLiveData(BluetoothConnectionStatus.Disconnected)
     val bluetoothConnectionStatus by this::_bluetoothConnectionStatus
+    private var _bluetoothDataTransferStatus: MutableLiveData<Boolean> = MutableLiveData(true)
+    val bluetoothDataTransferStatus by this::_bluetoothDataTransferStatus
     private val scope = CoroutineScope(Dispatchers.Main)
 
 
@@ -80,10 +84,39 @@ class UpdateTimeViewModel(
         }
     }
 
+    fun updateTime() {
+        scope.launch {
+            _bluetoothDataTransferStatus.value = bluetoothRepository.writeByteArray(
+                getDateTimePacket()
+            )
+        }
+    }
+
     fun getPairedDevicesStringList() {
         if (bluetoothIsEnabledData.value == true) {
             pairedDevicesList = bluetoothRepository.getPairedDevicesStringList()
         }
+    }
+
+    private fun getDateTimePacket(): ByteArray {
+        val packet = ByteArray(9)
+        var checkSum = 0xCC
+        packet[0] = checkSum.toByte()
+
+        dateTimeRepository.getCurrentDateTimeArray().forEachIndexed { index, i ->
+            packet[index + 1] = i.fromIntToBcdByte()
+            checkSum += packet[index + 1]
+        }
+        packet[packet.size - 1] = checkSum.toByte()
+        return packet
+    }
+
+    private fun Int.fromIntToBcdByte(): Byte {
+        val dec = (this/10).shl(4)
+        val units = (this%10)
+        val result = dec.or(units).toByte()
+
+        return result
     }
 
     override fun onStop(owner: LifecycleOwner) {

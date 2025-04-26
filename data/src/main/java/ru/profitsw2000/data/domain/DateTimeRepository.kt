@@ -7,4 +7,5 @@ interface DateTimeRepository {
     val dateDataString: StateFlow<String>
     val timeDataString: StateFlow<String>
 
+    fun getCurrentDateTimeArray(): Array<Int>
 }

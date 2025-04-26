@@ -21,6 +21,8 @@ interface BluetoothRepository {
 
     suspend fun disconnectDevice(): BluetoothConnectionStatus
 
+    suspend fun writeByteArray(byteArray: ByteArray): Boolean
+
     fun registerReceiver()
 
     fun unregisterReceiver()
