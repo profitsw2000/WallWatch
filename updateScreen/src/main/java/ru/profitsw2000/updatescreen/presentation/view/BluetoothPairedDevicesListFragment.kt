@@ -21,7 +21,6 @@ import ru.profitsw2000.updatescreen.presentation.view.adapter.BluetoothDevicesLi
 import ru.profitsw2000.updatescreen.presentation.viewmodel.UpdateTimeViewModel
 
 class BluetoothPairedDevicesListFragment : BottomSheetDialogFragment() {
-    private val TAG = "VVV"
     private var _binding: FragmentBluetoothPairedDevicesListBinding? = null
     private val binding get() = _binding!!
     private val updateTimeViewModel: UpdateTimeViewModel by viewModel()

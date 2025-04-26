@@ -1,10 +1,8 @@
 package ru.profitsw2000.updatescreen.presentation.viewmodel
 
-import android.annotation.SuppressLint
 import android.bluetooth.BluetoothDevice
 import android.os.Build
 import android.os.Build.VERSION
-import android.util.Log
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
@@ -23,7 +21,6 @@ class UpdateTimeViewModel(
     private val bluetoothRepository: BluetoothRepository
 ) : ViewModel(), DefaultLifecycleObserver {
 
-    private val TAG = "VVV"
     val dateLiveData: LiveData<String> = dateTimeRepository.dateDataString.asLiveData()
     val timeLiveData: LiveData<String> = dateTimeRepository.timeDataString.asLiveData()
     val bluetoothIsEnabledData: LiveData<Boolean> = bluetoothRepository.bluetoothIsEnabledData.asLiveData()
@@ -45,7 +42,6 @@ class UpdateTimeViewModel(
         if (permissionIsGranted) bluetoothRepository.initBluetooth()
     }
 
-    @SuppressLint("SuspiciousIndentation")
     fun disableBluetooth() {
         if (VERSION.SDK_INT <= Build.VERSION_CODES.S){
             if (bluetoothConnectionStatus.value == BluetoothConnectionStatus.Disconnected ||

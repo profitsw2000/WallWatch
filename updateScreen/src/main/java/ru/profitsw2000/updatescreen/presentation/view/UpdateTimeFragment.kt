@@ -3,45 +3,31 @@ package ru.profitsw2000.updatescreen.presentation.view
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.bluetooth.BluetoothAdapter
-import android.bluetooth.BluetoothManager
-import android.content.Context
 import android.content.Intent
-import android.content.IntentFilter
 import android.content.pm.PackageManager
-import android.os.Build
 import android.os.Build.VERSION
 import android.os.Build.VERSION_CODES
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.setFragmentResultListener
 import androidx.lifecycle.Observer
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import ru.profitsw2000.core.utils.bluetoothbroadcastreceiver.BluetoothStateBroadcastReceiver
-import ru.profitsw2000.core.utils.bluetoothbroadcastreceiver.OnBluetoothStateListener
 import ru.profitsw2000.data.model.BluetoothConnectionStatus
-import ru.profitsw2000.data.model.BluetoothState
 import ru.profitsw2000.updatescreen.R
 import ru.profitsw2000.updatescreen.databinding.FragmentUpdateTimeBinding
 import ru.profitsw2000.updatescreen.presentation.viewmodel.UpdateTimeViewModel
 
 class UpdateTimeFragment : Fragment() {
 
-    private val TAG = "VVV"
     private var _binding: FragmentUpdateTimeBinding? = null
     private val binding get() = _binding!!
     private val updateTimeViewModel: UpdateTimeViewModel by viewModel()

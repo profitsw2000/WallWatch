@@ -8,4 +8,5 @@
     <dimen name="scaff_button_half_internal_padding">8dp</dimen>
     <dimen name="list_item_spacing">16dp</dimen>
     <dimen name="list_item_spacing_half">8dp</dimen>
+    <dimen name="title_recycler_view_margin">8dp</dimen>
 </resources>
