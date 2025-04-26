@@ -1,5 +1,6 @@
 package ru.profitsw2000.updatescreen.presentation.viewmodel
 
+import android.annotation.SuppressLint
 import android.bluetooth.BluetoothDevice
 import android.os.Build
 import android.os.Build.VERSION
@@ -42,6 +43,7 @@ class UpdateTimeViewModel(
         if (permissionIsGranted) bluetoothRepository.initBluetooth()
     }
 
+    @SuppressLint("SuspiciousIndentation")
     fun disableBluetooth() {
         if (VERSION.SDK_INT <= Build.VERSION_CODES.S){
             if (bluetoothConnectionStatus.value == BluetoothConnectionStatus.Disconnected ||
